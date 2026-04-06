@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elle Belle - Billing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #0a0a0a 0%, #1a0a2e 40%, #0a1628 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 16px;
+    }
+
+    .container { width: 100%; max-width: 480px; }
+
+    /* ========== Card ========== */
+    .card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    .card-body { padding: 36px 28px; }
+    @media (min-width: 500px) { .card-body { padding: 44px 36px; } }
+
+    /* ========== Header ========== */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #e8d5b7, #f5e6d0, #c9a96e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-top: 4px;
+    }
+
+    /* ========== Status ========== */
+    .status-msg {
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .status-msg.success { display:block; background:rgba(34,197,94,0.1); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+    .status-msg.error { display:block; background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+
+    /* ========== Customer Info Banner ========== */
+    .customer-banner {
+      background: rgba(139,92,246,0.08);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+    .customer-banner.visible { display: flex; align-items: center; gap: 12px; }
+    .customer-banner .cb-icon {
+      width: 38px; height: 38px;
+      background: rgba(139,92,246,0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .customer-banner .cb-icon svg { width: 18px; height: 18px; stroke: #a78bfa; }
+    .customer-banner .cb-name { font-size: 15px; font-weight: 700; color: #fff; }
+    .customer-banner .cb-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
+    .customer-banner .cb-orders {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      color: #a78bfa;
+      background: rgba(139,92,246,0.1);
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .customer-banner .cb-orders:hover { background: rgba(139,92,246,0.2); }
+
+    /* ========== History Panel ========== */
+    .history-panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: none;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .history-panel.open { display: block; animation: slideDown 0.3s ease; }
+    .history-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    .history-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; margin-bottom: 6px; }
+    .history-item:last-child { margin-bottom: 0; }
+    .history-item .hi-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .history-item .hi-date { font-size: 11px; color: rgba(255,255,255,0.2); font-family: monospace; }
+    .history-item .hi-total { font-size: 13px; font-weight: 700; color: #c9a96e; }
+
+    /* ========== Labels ========== */
+    .label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .label svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.25); }
+
+    /* ========== Inputs ========== */
+    input, select {
+      width: 100%;
+      padding: 15px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      outline: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      border-color: rgba(201,169,110,0.4);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.08);
+    }
+    input::placeholder { color: rgba(255,255,255,0.15); }
+    select { cursor: pointer; appearance: none; -webkit-appearance: none; }
+    select option { background: #1a1a2e; color: #fff; }
+
+    /* ========== Field Group ========== */
+    .field { margin-bottom: 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ========== Payment Options ========== */
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .pay-opt {
+      position: relative;
+    }
+    .pay-opt input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .pay-opt label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.2s;
+    }
+    .pay-opt label svg { width: 18px; height: 18px; stroke: rgba(255,255,255,0.3); transition: all 0.2s; }
+    .pay-opt label:hover { background: rgba(255,255,255,0.05); }
+    .pay-opt input[type="radio"]:checked + label {
+      background: rgba(201,169,110,0.1);
+      border-color: rgba(201,169,110,0.3);
+      color: #e8d5b7;
+    }
+    .pay-opt input[type="radio"]:checked + label svg { stroke: #c9a96e; }
+
+    /* ========== Amount Display ========== */
+    .amount-display {
+      text-align: center;
+      padding: 24px 0 8px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 8px;
+    }
+    .amount-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .amount-value {
+      font-size: 42px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #e8d5b7, #c9a96e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    .pending-info {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f87171;
+      display: none;
+    }
+    .pending-info.visible { display: block; }
+
+    /* ========== Submit ========== */
+    .btn-submit {
+      width: 100%;
+      padding: 18px;
+      margin-top: 24px;
+      background: linear-gradient(135deg, #c9a96e, #e8d5b7);
+      color: #0a0a0a;
+      border: none;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(201,169,110,0.2);
+      transition: all 0.25s ease;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(201,169,110,0.3); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit svg { width: 20px; height: 20px; }
+
+    /* ========== Spinner ========== */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 3px solid rgba(0,0,0,0.15);
+      border-top-color: #0a0a0a;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ========== Footer ========== */
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.12);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    /* ========== Scrollbar ========== */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { opacity: 0.3; }
+
+    /* ========== Rupee prefix ========== */
+    .rupee-input { position: relative; }
+    .rupee-input .prefix {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.2);
+      font-size: 15px;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    .rupee-input input { padding-left: 32px; }
+
+    /* ========== Loading dot ========== */
+    .loading-dot {
+      display: none;
+      width: 8px; height: 8px;
+      background: #c9a96e;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .loading-dot.active { display: block; }
+    @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="brand">Elle Belle</div>
+        <div class="brand-sub">Billing Portal</div>
+      </div>
+
+      <!-- Status -->
+      <div id="statusMsg" class="status-msg"></div>
+
+      <!-- Customer Banner (auto shows when found) -->
+      <div class="customer-banner" id="customerBanner">
+        <div class="cb-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
+        </div>
+        <div>
+          <div class="cb-label">Customer</div>
+          <div class="cb-name" id="customerNameDisplay">-</div>
+        </div>
+        <div class="cb-orders" id="historyToggle" onclick="toggleHistory()">
+          <span id="historyCount">0</span> Orders
+        </div>
+      </div>
+
+      <!-- History Panel -->
+      <div id="historyPanel" class="history-panel">
+        <div class="history-title">Past Bills</div>
+        <div id="historyList"></div>
+      </div>
+
+      <!-- Form -->
+      <form id="orderForm" onsubmit="submitOrder(event)">
+
+        <!-- Mobile Number -->
+        <div class="field">
+          <label class="label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" /></svg>
+            Mobile Number
+          </label>
+          <div style="position:relative;">
+            <input type="tel" id="phone" required placeholder="Enter 10 digit number" maxlength="10" pattern="[0-9]{10}" oninput="onPhoneInput(this.value)" />
+            <div class="loading-dot" id="phoneLoader"></div>
+          </div>
+        </div>
+
+        <!-- Customer Name (hidden, auto-fill or manual) -->
+        <div class="field" id="nameField">
+          <label class="label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" /></svg>
+            Customer Name
+          </label>
+          <input type="text" id="customerName" required placeholder="Customer name" />
+        </div>
+
+        <!-- Bill No & Total Amount -->
+        <div class="grid-2 field">
+          <div>
+            <label class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" /></svg>
+              Bill No
+            </label>
+            <input type="text" id="billNo" required placeholder="e.g. 1001" />
+          </div>
+          <div>
+            <label class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+              Total Amount
+            </label>
+            <div class="rupee-input">
+              <span class="prefix">₹</span>
+              <input type="number" id="totalAmount" required min="0" placeholder="0" oninput="updateDisplay()" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode of Payment -->
+        <div class="field">
+          <label class="label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+            Payment Mode
+          </label>
+          <div class="payment-options">
+            <div class="pay-opt">
+              <input type="radio" name="paymentMode" id="payCash" value="Cash" checked />
+              <label for="payCash">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
+                Cash
+              </label>
+            </div>
+            <div class="pay-opt">
+              <input type="radio" name="paymentMode" id="payUPI" value="UPI" />
+              <label for="payUPI">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" /></svg>
+                UPI
+              </label>
+            </div>
+            <div class="pay-opt">
+              <input type="radio" name="paymentMode" id="payCard" value="Card" />
+              <label for="payCard">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+                Card
+              </label>
+            </div>
+            <div class="pay-opt">
+              <input type="radio" name="paymentMode" id="payOnline" value="Online" />
+              <label for="payOnline">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+                Online
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Balance -->
+        <div class="field">
+          <label class="label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            Pending Balance
+          </label>
+          <div class="rupee-input">
+            <span class="prefix">₹</span>
+            <input type="number" id="pendingBalance" min="0" value="0" placeholder="0" oninput="updateDisplay()" />
+          </div>
+        </div>
+
+        <!-- Amount Display -->
+        <div class="amount-display">
+          <div class="amount-label">Bill Total</div>
+          <div class="amount-value" id="totalDisplay">₹0</div>
+          <div class="pending-info" id="pendingInfo">Pending: ₹<span id="pendingDisplay">0</span></div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" /></svg>
+          Save Bill & Send WhatsApp
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">Elle Belle - Billing System</div>
+</div>
+
+<script>
+  // ============ CONFIG ============
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysv47dmDJnoqsVvRm5iwBjKT1nkVV5bmVev-ZCbjY33DhyrFSGtLBq3XW1MeCrnrAJ/exec';
+  // =================================
+
+  // -------- Phone Input & Auto-fill --------
+  function onPhoneInput(val) {
+    if (val.length >= 10 && GOOGLE_SCRIPT_URL) {
+      document.getElementById('phoneLoader').classList.add('active');
+      fetchHistory(val);
+    } else {
+      document.getElementById('customerBanner').classList.remove('visible');
+      document.getElementById('phoneLoader').classList.remove('active');
+    }
+  }
+
+  async function fetchHistory(phone) {
+    try {
+      const res = await fetch(GOOGLE_SCRIPT_URL + '?phone=' + phone);
+      const data = await res.json();
+      if (data && data.orders && data.orders.length > 0) {
+        // Auto-fill name
+        if (data.customerName) {
+          document.getElementById('customerName').value = data.customerName;
+          document.getElementById('customerNameDisplay').textContent = data.customerName;
+          document.getElementById('customerBanner').classList.add('visible');
+          document.getElementById('historyCount').textContent = data.orders.length;
+        }
+        renderHistory(data.orders);
+      }
+    } catch (e) {
+      console.log('History fetch failed:', e);
+    } finally {
+      document.getElementById('phoneLoader').classList.remove('active');
+    }
+  }
+
+  function renderHistory(orders) {
+    const list = document.getElementById('historyList');
+    list.innerHTML = orders.map(o => `
+      <div class="history-item">
+        <div class="hi-top">
+          <span class="hi-date">${o.date || ''}</span>
+          <span class="hi-total">₹${o.totalAmount || 0}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function toggleHistory() {
+    document.getElementById('historyPanel').classList.toggle('open');
+  }
+
+  // -------- Display Update --------
+  function updateDisplay() {
+    const total = parseFloat(document.getElementById('totalAmount').value) || 0;
+    const pending = parseFloat(document.getElementById('pendingBalance').value) || 0;
+
+    document.getElementById('totalDisplay').textContent = '₹' + total.toLocaleString('en-IN');
+
+    const pendingInfo = document.getElementById('pendingInfo');
+    if (pending > 0) {
+      pendingInfo.classList.add('visible');
+      document.getElementById('pendingDisplay').textContent = pending.toLocaleString('en-IN');
+    } else {
+      pendingInfo.classList.remove('visible');
+    }
+  }
+
+  // -------- Form Submit --------
+  async function submitOrder(e) {
+    e.preventDefault();
+
+    if (!GOOGLE_SCRIPT_URL) {
+      showStatus('Google Script URL set nahi hai!', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Saving...';
+
+    const paymentMode = document.querySelector('input[name="paymentMode"]:checked').value;
+
+    const orderData = {
+      customerName: document.getElementById('customerName').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      billNo: document.getElementById('billNo').value.trim(),
+      totalAmount: parseFloat(document.getElementById('totalAmount').value) || 0,
+      paymentMode: paymentMode,
+      pendingBalance: parseFloat(document.getElementById('pendingBalance').value) || 0,
+      date: new Date().toLocaleDateString('en-IN'),
+    };
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+
+      showStatus('Bill saved & WhatsApp message sent!', 'success');
+      resetForm();
+    } catch (err) {
+      console.error('Submit failed:', err);
+      showStatus('Bill save failed. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" /></svg>
+        Save Bill & Send WhatsApp
+      `;
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('customerName').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('billNo').value = '';
+    document.getElementById('totalAmount').value = '';
+    document.getElementById('pendingBalance').value = '0';
+    document.querySelector('#payCash').checked = true;
+    document.getElementById('customerBanner').classList.remove('visible');
+    document.getElementById('historyPanel').classList.remove('open');
+    updateDisplay();
+  }
+
+  function showStatus(msg, type) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg;
+    el.className = 'status-msg ' + type;
+    if (type === 'success') {
+      setTimeout(() => { el.className = 'status-msg'; }, 4000);
+    }
+  }
+</script>
+
+</body>
+</html>
